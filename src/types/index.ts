@@ -22,3 +22,21 @@ export interface IBuyer {
   phone: string;
   address: string;
 }
+
+// Ответ GET /product/
+export interface IProductsResponse {
+  total: number;
+  items: IProduct[];
+}
+
+// Тело запроса POST /order/
+export interface IOrderRequest extends IBuyer {
+  total: number;
+  items: string[];
+}
+
+// Ответ POST /order/
+export interface IOrderResponse {
+  id: string;
+  total: number;
+}

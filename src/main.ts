@@ -5,6 +5,10 @@ import { Products } from './components/Models/Products';
 import { Cart } from './components/Models/Cart';
 import { Buyer } from './components/Models/Buyer';
 
+import { API_URL } from './utils/constants';
+import { Api } from './components/base/Api';
+import { AppApi } from './components/Models/AppApi';
+
 
 /*Проверка работы методов класса Products*/
 const productsModel = new Products();
@@ -47,3 +51,16 @@ console.log('После добавления payment и address:', buyerModel.ge
 
 buyerModel.clear();
 console.log('После очистки:', buyerModel.getData());
+
+/*Проверка работы с Api */
+const api = new Api(API_URL);
+
+const appApi = new AppApi(api);
+
+try {
+    const data = await appApi.getProducts();
+    productsModel.setItems(data.items);
+    console.log('Каталог:', productsModel.getItems());
+} catch (err) {
+    console.error('Ошибка загрузки товаров:', err);
+}
