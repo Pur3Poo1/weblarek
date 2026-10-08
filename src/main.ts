@@ -52,7 +52,7 @@ console.log('После добавления payment и address:', buyerModel.ge
 buyerModel.clear();
 console.log('После очистки:', buyerModel.getData());
 
-/*Проверка работы с Api */
+/*Проверка работы с классом AppsApi */
 const api = new Api(API_URL);
 
 const appApi = new AppApi(api);
