@@ -1,6 +1,6 @@
 import { Card } from "./Card";
-import { IEvents } from "../base/Events";
-import { IProduct } from "../../types";
+import { IEvents } from "../../base/Events";
+import { IProduct } from "../../../types";
 
 export class CardCatalog extends Card<IProduct> {
     constructor(protected events: IEvents, container: HTMLElement){

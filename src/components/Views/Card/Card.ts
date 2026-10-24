@@ -1,6 +1,6 @@
-import { Component } from "../base/Component";
-import { ensureElement } from "../../utils/utils";
-import { IProduct } from "../../types";
+import { Component } from "../../base/Component";
+import { ensureElement } from "../../../utils/utils";
+import { IProduct } from "../../../types";
 
 
 export class Card<T extends IProduct> extends Component<T>{
