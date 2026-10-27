@@ -4,14 +4,24 @@ import { apiProducts } from './utils/data';
 import { Products } from './components/Models/Products';
 import { Cart } from './components/Models/Cart';
 import { Buyer } from './components/Models/Buyer';
+import { EventEmitter } from './components/base/Events';
+
 
 import { API_URL } from './utils/constants';
 import { Api } from './components/base/Api';
 import { AppApi } from './components/Models/AppApi';
 
+const events = new EventEmitter();
+
+// подписки — чтобы видеть, что события реально приходят
+events.on('products:changed', (data) => console.log('[products:changed]', data));
+events.on('preview:changed', (data) => console.log('[preview:changed]', data));
+events.on('basket:changed', (data) => console.log('[basket:changed]', data));
+events.on('buyer:changed', (data) => console.log('[buyer:changed]', data));
+
 
 /*Проверка работы методов класса Products*/
-const productsModel = new Products();
+const productsModel = new Products(events);
 productsModel.setItems(apiProducts.items);
 console.log('Массив товаров из каталога:', productsModel.getItems());
 
@@ -22,7 +32,7 @@ console.log('Товар для подробного отображения:', pr
 console.log('Товар по id:', productsModel.getItem(firstProduct.id));
 
 /*Проверка работы методов класса Cart*/
-const basketModel = new Cart();
+const basketModel = new Cart(events);
 basketModel.addItem(firstProduct);
 basketModel.addItem(productsModel.getItems()[1]);
 
@@ -38,7 +48,7 @@ basketModel.clear();
 console.log('После очистки:', basketModel.getItems());
 
 /*Проверка работы методов класса Buyers*/
-const buyerModel = new Buyer();
+const buyerModel = new Buyer(events);
 console.log('Пустой покупатель:', buyerModel.getData());
 console.log('Ошибки валидации:', buyerModel.validate());
 
