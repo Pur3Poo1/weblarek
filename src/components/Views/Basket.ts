@@ -1,12 +1,7 @@
 import { Component } from '../base/Component';
 import { ensureElement } from '../../utils/utils';
 import { IEvents } from '../base/Events';
-
-interface IBasketData {
-    items: HTMLElement[];
-    total: number;
-    canOrder: boolean;
-}
+import { IBasketData } from '../../types';
 
 export class Basket extends Component<IBasketData> {
     protected listElement: HTMLElement;

@@ -1,10 +1,7 @@
 import { Component } from "../base/Component";
 import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/Events";
-
-interface IHeader{
-    counter: number;
-}
+import { IHeader } from "../../types";
 
 export class Header extends Component<IHeader> {
     protected basketButton: HTMLButtonElement;
