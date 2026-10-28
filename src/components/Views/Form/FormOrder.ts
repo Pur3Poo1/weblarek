@@ -21,15 +21,15 @@ export class Order extends Form<IOrderData> {
         this.addressInput = ensureElement<HTMLInputElement>('input[name="address"]', container);
 
         this.cardButton.addEventListener('click', () => {
-        this.events.emit('order:change', { field: 'payment', value: 'card' });
+            this.events.emit('order:change', { field: 'payment', value: 'card' });
         });
 
         this.cashButton.addEventListener('click', () => {
-        this.events.emit('order:change', { field: 'payment', value: 'cash' });
+            this.events.emit('order:change', { field: 'payment', value: 'cash' });
         });
     }
 
-    set payment(value: TPayment) {
+    set payment(value: TPayment | '') {
         this.cardButton.classList.toggle('button_alt-active', value === 'card');
         this.cashButton.classList.toggle('button_alt-active', value === 'cash');
     }

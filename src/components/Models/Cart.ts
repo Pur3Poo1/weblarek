@@ -13,8 +13,10 @@ export class Cart {
 
     //Добавление товара в корзину
     addItem(item: IProduct): void {
-        this.items.push(item);
-        this.events.emit('basket:changed', { items: this.items });
+        if (!this.hasItem(item.id)) {
+            this.items.push(item);
+            this.events.emit('basket:changed', { items: this.items });
+        }
     }
 
     //Удаление товара из корзины

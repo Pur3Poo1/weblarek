@@ -13,19 +13,29 @@ export class Modal extends Component<IModalData> {
     constructor(protected events: IEvents, container: HTMLElement){
         super(container);
 
-        this.closeButton = ensureElement<HTMLButtonElement>('.modal__close', this.container);
-        this.contentElement = ensureElement<HTMLElement>('.modal__content', this.container);
+        this.closeButton = ensureElement<HTMLButtonElement>('.modal__close', container);
+        this.contentElement = ensureElement<HTMLElement>('.modal__content', container);
 
         this.closeButton.addEventListener('click', () =>{
             this.events.emit('modal:close');
         });
-    }
-    
-    set isOpen(value:boolean){
-        this.container.classList.toggle('modal_active', value);
+
+        this.container.addEventListener('click', (e) => {
+            if (e.target === this.container) {
+                this.events.emit('modal:close');
+            }
+        });
     }
 
     set content(value:HTMLElement){
-        this.container.replaceChildren(value);
+        this.contentElement.replaceChildren(value);
+    }
+
+    open(): void {
+        this.container.classList.add('modal_active');
+    }
+
+    close(): void {
+        this.container.classList.remove('modal_active');
     }
 }
