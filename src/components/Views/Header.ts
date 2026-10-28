@@ -20,9 +20,7 @@ export class Header extends Component<IHeader> {
             this.events.emit('basket:open');
         })
     }
-    // объект HeaderData у которого будет counter:value
-    
-    //принимает какое-то значение типа число сеттер
+
     set counter(value:number){
         this.counterElement.textContent = String(value);
     }

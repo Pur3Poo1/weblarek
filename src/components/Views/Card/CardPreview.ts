@@ -24,16 +24,16 @@ export class CardPreview extends Card<IProduct> {
         });
     }
 
-        set image(value: string) {
-            this.setImage(this.imageElement, CDN_URL + value);
-        }
+    set image(value: string) {
+        this.setImage(this.imageElement, CDN_URL + value);
+    }
 
-        set category(value: string) {
-            this.categoryElement.textContent = value;
-            for (const [name, modifier] of Object.entries(categoryMap)) {
-                this.categoryElement.classList.toggle(modifier, name === value);
-            }
+    set category(value: string) {
+        this.categoryElement.textContent = value;
+        for (const [name, modifier] of Object.entries(categoryMap)) {
+            this.categoryElement.classList.toggle(modifier, name === value);
         }
+    }
 
     set description(value: string) {
         this.descriptionElement.textContent = value;
