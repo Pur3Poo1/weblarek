@@ -11,7 +11,7 @@ export class CardPreview extends Card<IProduct> {
     protected descriptionElement: HTMLElement;
     protected buttonElement: HTMLButtonElement;
 
-    constructor(protected events: IEvents, container: HTMLElement) {
+    constructor(container: HTMLElement, protected onButtonClick: () => void) {
         super(container);
 
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', container);
@@ -19,9 +19,7 @@ export class CardPreview extends Card<IProduct> {
         this.descriptionElement = ensureElement<HTMLElement>('.card__text', container);
         this.buttonElement = ensureElement<HTMLButtonElement>('.card__button', container);
 
-        this.buttonElement.addEventListener('click', () => {
-            this.events.emit('card:action', { id: this.container.dataset.id });
-        });
+        this.buttonElement.addEventListener('click', () => this.onButtonClick());
     }
 
     set image(value: string) {
@@ -39,12 +37,11 @@ export class CardPreview extends Card<IProduct> {
         this.descriptionElement.textContent = value;
     }
 
-    set inBasket(value: boolean) {
-        this.buttonElement.textContent = value ? 'Удалить из корзины' : 'В корзину';
+    set buttonText(value: string) {
+        this.buttonElement.textContent = value;
     }
 
-    set price(value: number | null) {
-        super.price = value;
-        this.buttonElement.disabled = value === null;
+    set buttonDisabled(value: boolean) {
+        this.buttonElement.disabled = value;
     }
 }

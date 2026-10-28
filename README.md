@@ -259,7 +259,7 @@ protected counterElement: HTMLElement - счетчик количества тт
 set counter(value:number) - возвращаетт количество товаров 
 #### Класс Modal
 Конструктор:
-constructor(protected events: IEvents, container: HTMLElement) - принимает брокер событий и DOM-элемент модального окна
+constructor(container: HTMLElement) - принимает DOM-элемент модального окна
 
 Поля класса:  
 protected closeButton: HTMLButtonElement - кнопка закрытия модально окна
@@ -279,13 +279,12 @@ protected titleElement: HTMLElement - элемент с названием то�
 protected priceElement: HTMLElement - элемент с ценой товара
 
 Методы класса:  
-set id(value: string) - сохраняет идентификатор товара в dataset контейнера 
 set title(value: string) - устанавливает название товара 
 set price(value: number | null) - устанавливает цену товара 
 
 #### Класс CardBasket
 Конструктор:
-constructor(protected events: IEvents, container: HTMLElement) - принимает брокер событий и DOM-элемент карточки
+constructor(container: HTMLElement, protected onDelete: () => void) - DOM-элемент карточки и колбэк
 
 Поля класса:  
 protected indexElement: HTMLElement - порядковый номер товара в корзине 
@@ -296,7 +295,7 @@ set index(value: number) - устанавливает порядковый но�
 
 #### Класс CardCatalog
 Конструктор:
-constructor(protected events: IEvents, container: HTMLElement) - принимает брокер событий и DOM-элемент карточки
+cconstructor(container: HTMLElement, protected onClick: () => void) - DOM-элемент карточки и колбэк
 
 Поля класса:  
 protected imageElement: HTMLImageElement - изображение товара 
@@ -308,7 +307,7 @@ set category(value: string) - устанавливает категорию то
 
 #### Класс CardPreview
 Конструктор:
-constructor(protected events: IEvents, container: HTMLElement) - принимает брокер событий и DOM-элемент карточки
+constructor(container: HTMLElement, protected onButtonClick: () => void) - DOM-элемент карточки и колюэк
 
 Поля класса:  
 protected imageElement: HTMLImageElement - изображение товара
@@ -320,8 +319,8 @@ protected buttonElement: HTMLButtonElement - кнопка добавления/�
 set image(value: string) - устанавливает изображение товара
 set category(value: string) -  устанавливает категорию товара и добавляет соответствующий модификатор
 set description(value: string) - устанавливает описание товара
-set inBasket(value: boolean) - переключает текст кнопки в зависимости от того, находится ли товар в корзине
-set price(value: number | null) - устанавливает цену и блокирует кнопку, если цена null
+set buttonText(value: string) - устанавливает текст кнопки
+set buttonDisabled(value: boolean) - управляет доступностью кнопки
 
 #### Класс Form
 Конструктор:
@@ -419,7 +418,6 @@ preview:changed - Заполняет CardPreview и открывает мода�
 basket:changed - Обновляет счётчик в Header; если корзина открыта — перерисовывает её
 buyer:changed - Обновляет состояние открытой формы: активную кнопку оплаты, доступность кнопки отправки и текст ошибок
 card:select - Находит товар по id и сохраняет его в модель как preview
-card:action - Добавляет товар в корзину или удаляет из неё, закрывает модальное окно
 basket:open - Собирает Basket и открывает модальное окно
 basket:remove - Удаляет товар из модели корзины
 order:start - Заполняет FormOrder начальными значениями и открывает модальное окно
@@ -428,4 +426,3 @@ contacts:change - Сохраняет изменённое поле в модел
 order:submit - Заполняет FormContacts и показывает её в модальном окне
 contacts:submit - Отправляет заказ на сервер, очищает корзину и данные покупателя, показывает FormSuccess
 success:close - Закрывает модальное окно
-modal:close - Закрывает модальное окно

@@ -1,7 +1,6 @@
 import { Card } from "./Card";
 import { ensureElement } from "../../../utils/utils";
 import { categoryMap, CDN_URL} from "../../../utils/constants";
-import { IEvents } from "../../base/Events";
 import { IProduct } from "../../../types";
 
 
@@ -9,15 +8,13 @@ export class CardCatalog extends Card<IProduct> {
     protected imageElement: HTMLImageElement;
     protected categoryElement: HTMLElement;
 
-    constructor(protected events: IEvents, container: HTMLElement) {
+    constructor(container: HTMLElement, protected onClick: () => void) {
         super(container);
 
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', container);
         this.categoryElement = ensureElement<HTMLElement>('.card__category', container);
 
-        this.container.addEventListener('click', () => {
-            this.events.emit('card:select', { id: this.container.dataset.id });
-        });
+        this.container.addEventListener('click', () => this.onClick());
     }
 
     set image(value: string) {

@@ -54,10 +54,21 @@ const modalContainer = ensureElement<HTMLElement>('#modal-container');
 // Корневые компоненты
 const header = new Header(events, headerContainer);
 const gallery = new Gallery(galleryContainer);
-const modal = new Modal(events, modalContainer);
+const modal = new Modal(modalContainer);
 
 // Модальные компоненты
-const cardPreview = new CardPreview(events, cloneTemplate(cardPreviewTemplate));
+const cardPreview = new CardPreview(cloneTemplate(cardPreviewTemplate), () => {
+    const product = productsModel.getPreview();
+    if (!product) return;
+
+    if (basketModel.hasItem(product.id)) {
+        basketModel.removeItem(product);
+    } else {
+        basketModel.addItem(product);
+    }
+    modal.close();
+});
+
 const basketView = new BasketView(events, cloneTemplate(basketTemplate));
 const orderForm = new Order(events, cloneTemplate<HTMLFormElement>(orderTemplate));
 const contactsForm = new Contacts(events, cloneTemplate<HTMLFormElement>(contactsTemplate));
@@ -76,8 +87,10 @@ appApi
 // Описание события измения каталога
 events.on('products:changed', () => {
     const cards = productsModel.getItems().map((product) => {
-        const card = new CardCatalog(events, cloneTemplate(cardCatalogTemplate));
-        card.id = product.id;
+        const card = new CardCatalog(cloneTemplate(cardCatalogTemplate), () => {
+            events.emit('card:select', { id: product.id });
+        });
+
         card.title = product.title;
         card.price = product.price;
         card.category = product.category;
@@ -93,9 +106,7 @@ events.on('basket:changed', () => {
     // Счетчик
     header.counter = basketModel.getCount();
     // Содержимое корзины
-    if (modalContainer.querySelector('.basket')) {
-        renderBasket();
-    }
+    renderBasket();
 });
 
 // Описание события измения подробной карточки товара
@@ -103,13 +114,22 @@ events.on('preview:changed', () => {
     const product = productsModel.getPreview();
     if (!product) return;
 
-    cardPreview.id = product.id;
     cardPreview.title = product.title;
     cardPreview.price = product.price;
     cardPreview.category = product.category;
     cardPreview.image = product.image;
     cardPreview.description = product.description;
-    cardPreview.inBasket = basketModel.hasItem(product.id);
+
+    if (product.price === null) {
+        cardPreview.buttonText = 'Недоступно';
+        cardPreview.buttonDisabled = true;
+    } else if (basketModel.hasItem(product.id)) {
+        cardPreview.buttonText = 'Удалить из корзины';
+        cardPreview.buttonDisabled = false;
+    } else {
+        cardPreview.buttonText = 'В корзину';
+        cardPreview.buttonDisabled = false;
+    }
 
     modal.content = cardPreview.render();
     modal.open();
@@ -120,17 +140,17 @@ events.on('buyer:changed', () => {
     const errors = buyerModel.validate();
     const buyer = buyerModel.getData();
 
-    if (modalContainer.querySelector('form[name="order"]')) {
-        // активный способ оплаты
-        orderForm.payment = buyer.payment; 
-        orderForm.canSubmit = !errors.payment && !errors.address;
-        orderForm.errors = [errors.payment, errors.address].filter(Boolean).join('. ');
-    }
+    // форма заказа
+    orderForm.payment = buyer.payment;
+    orderForm.address = buyer.address;
+    orderForm.canSubmit = !errors.payment && !errors.address;
+    orderForm.errors = [errors.payment, errors.address].filter(Boolean).join('. ');
 
-    if (modalContainer.querySelector('form[name="contacts"]')) {
-        contactsForm.canSubmit = !errors.email && !errors.phone;
-        contactsForm.errors = [errors.email, errors.phone].filter(Boolean).join('. ');
-    }
+    // форма контактов
+    contactsForm.email = buyer.email;
+    contactsForm.phone = buyer.phone;
+    contactsForm.canSubmit = !errors.email && !errors.phone;
+    contactsForm.errors = [errors.email, errors.phone].filter(Boolean).join('. ');
 });
 
 
@@ -142,23 +162,9 @@ events.on('card:select', (data: { id: string }) => {
     }
 });
 
-// Описание события нажатия кнопки "добавить/удалить товар"
-events.on('card:action', (data: { id: string }) => {
-    const product = productsModel.getItem(data.id);
-    if (!product) return;
-
-    if (basketModel.hasItem(product.id)) {
-        basketModel.removeItem(product);
-    } else {
-        basketModel.addItem(product);
-    }
-
-    modal.close();
-});
-
 // Описание события открытия корзины товаров
 events.on('basket:open', () => {
-    renderBasket();
+    modal.content = basketView.render();
     modal.open();
 });
 
@@ -172,13 +178,6 @@ events.on('basket:remove', (data: { id: string }) => {
 
 // Описание события открыия формы оформления заказа
 events.on('order:start', () => {
-    const buyer = buyerModel.getData();
-
-    orderForm.payment = buyer.payment;
-    orderForm.address = buyer.address;
-    orderForm.errors = '';
-    orderForm.canSubmit = false;
-
     modal.content = orderForm.render();
     modal.open();
 });
@@ -195,13 +194,6 @@ events.on('contacts:change', (data: { field: keyof IBuyer; value: string }) => {
 
 // Описание события отправки первой формы
 events.on('order:submit', () => {
-    const buyer = buyerModel.getData();
-
-    contactsForm.email = buyer.email;
-    contactsForm.phone = buyer.phone;
-    contactsForm.errors = '';
-    contactsForm.canSubmit = false;
-
     modal.content = contactsForm.render();
 });
 
@@ -233,16 +225,14 @@ events.on('success:close', () => {
     modal.close();
 });
 
-// Описание события закрытия модального окна
-events.on('modal:close', () => {
-    modal.close();
-});
-
 // Создание карточек товаров для корзины товаров
 function createBasketCards(): HTMLElement[] {
     return basketModel.getItems().map((product, index) => {
-        const card = new CardBasket(events, cloneTemplate(cardBasketTemplate));
-        card.id = product.id;
+        const card = new CardBasket(
+            cloneTemplate(cardBasketTemplate),
+            () => events.emit('basket:remove', { id: product.id })
+        );
+
         card.title = product.title;
         card.price = product.price;
         card.index = index + 1;
@@ -258,5 +248,4 @@ function renderBasket(): void {
     basketView.total = basketModel.getTotalPrice();
     basketView.canOrder = items.length > 0;
 
-    modal.content = basketView.render();
 }
