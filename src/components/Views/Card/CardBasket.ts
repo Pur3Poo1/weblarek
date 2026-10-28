@@ -1,6 +1,5 @@
 import { Card } from './Card';
 import { ensureElement } from '../../../utils/utils';
-import { IEvents } from '../../base/Events';
 import { IProduct } from '../../../types';
 
 export class CardBasket extends Card<IProduct> {
